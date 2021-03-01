@@ -20,14 +20,11 @@ var r = 40; //rect width
 var i;
 var j;
 var rectFill;
-var sizeofGrid;
+
 
 function preload(){
     loadJSON(url, countryInfo);
     table = loadTable('assets/country_Info.csv', 'csv', 'header');
-    
-    
-
 }
 
 function countryInfo (data){
@@ -63,9 +60,6 @@ function getCountry(){
             saveTable(table, 'country_Info.csv', 'csv');
             table = loadTable('assets/country_Info.csv', 'csv', 'header');
             print(table);
-        //creating a new Dot object and storing in dot array
-            // dots.push(new Dot(lng, lat, 2, color));
-            // print(dots);
            
         }
     }
@@ -81,19 +75,17 @@ function setup(){
     button.mousePressed(getCountry)
     print(windowWidth, windowHeight);
 
-    sizeofGrid = windowWidth / r;
-
-    for (i = 0; i < width; i+= sizeofGrid) {
-        for (j = 0; j < height; j+= sizeofGrid) {
+    for (i = 0; i < width; i++) {
+        for (j = 0; j < height; j++) {
             if ((i+j) % 2 == 0) {
                rectFill = color(255,255,255);
               } else {
                 rectFill = color(0,0,0);
               }
+           
             rects.push(new Rect(i*r, j*r, r, rectFill));
         }
     } 
-    // print(Rect); 
 }
 
 
@@ -103,7 +95,6 @@ function draw(){
     for (var k=0; k<rects.length; k++){
         rects[k].render();
     }
-
 
     //box to hold text --> map key
     fill(255); 
@@ -128,9 +119,5 @@ function draw(){
     text(countryName, 12, 632);
     text(nativeName, 12,682); 
     text(countryFlag, 12, 732);
-
-    //draws dots on the map
-    //doesn't register as a function -- need to find different solution for drawing the dots
-
 
 }

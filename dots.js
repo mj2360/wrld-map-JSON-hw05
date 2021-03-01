@@ -1,5 +1,5 @@
 class Rect {
-    contructor(x, y, size, col){
+    constructor(x, y, size, col){
         this.x = x; 
         this.y = y; 
         this.size = size; 
@@ -10,6 +10,6 @@ class Rect {
     render(){
         noStroke(); 
         fill(this.color); 
-        rect (this.x, this.y, this.size, this.size);
+        rect(this.x, this.y, this.size, this.size);
     }
 }
