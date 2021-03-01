@@ -1,25 +1,74 @@
 var url = "https://restcountries.eu/rest/v2/all?fields=name;capital;population;latlng;nativeName;flag";
 var countriesData; 
 var input; 
+var table;
+
 var countryName; 
 var nativeName; 
 var countryFlag;
-var mapImg; 
+
 var lat; 
-var lng; 
+var lng;
+var convert_y; 
+var convert_x;  
 var pop; 
 var Color;
-var dots = []; 
+
+//variables for checkerboard
+var rects = []; 
+var r = 40; //rect width
+var i;
+var j;
+var rectFill;
+var sizeofGrid;
 
 function preload(){
     loadJSON(url, countryInfo);
-    mapImg = loadImage ("assets/wrld-map.png"); 
+    table = loadTable('assets/country_Info.csv', 'csv', 'header');
+    
     
 
 }
 
 function countryInfo (data){
     countriesData = data; 
+}
+
+function getCountry(){
+    for (var i=0; i<countriesData.length; i++){
+        if(input.value() == countriesData[i].name){
+            countryName = countriesData[i].name; 
+            nativeName = countriesData[i].nativeName;
+            countryFlag = countriesData[i].flag; 
+        //scaling long and lat based on 640x360 canvas
+            lng = (countriesData[i].latlng[1] + 180) * 2;
+            lat = (90 - countriesData[i].latlng[0]) * 2;
+        //mapping long and lat to windowWidth and Height
+            convert_x = map(lng, 0, 640, 0, windowWidth-90);
+            convert_y = map(lat, 0, 360, 0, windowHeight);
+        //mapping population size to circle size
+            pop = map(countriesData[i].population, 0, 1377422166, 5, 100);  
+        //choosing a random color for each Country
+            Color = color(random(255), random(255), random(255));
+            print(countriesData[i].name, lng, lat, pop);
+        
+        //saves the info for current country
+            var newRow = table.addRow();
+        //saving a new row for country name, x(lng), y(lat), pop
+            newRow.setString("countryName", countryName);
+            newRow.setString("xLoc", convert_x);
+            newRow.setString("yLoc", convert_y);
+            newRow.setString("population", pop);
+            newRow.setString("Colors", Color);
+            saveTable(table, 'country_Info.csv', 'csv');
+            table = loadTable('assets/country_Info.csv', 'csv', 'header');
+            print(table);
+        //creating a new Dot object and storing in dot array
+            // dots.push(new Dot(lng, lat, 2, color));
+            // print(dots);
+           
+        }
+    }
 }
 
 function setup(){
@@ -30,38 +79,48 @@ function setup(){
     input = select('#country');
     print(input);
     button.mousePressed(getCountry)
+    print(windowWidth, windowHeight);
 
-}
+    sizeofGrid = windowWidth / r;
 
-function getCountry(){
-    for (var i=0; i<countriesData.length; i++){
-        if(input.value() == countriesData[i].name){
-            countryName = countriesData[i].name; 
-            nativeName = countriesData[i].nativeName;
-            countryFlag = countriesData[i].flag; 
-            lat = map(countriesData[i].latlng[0], -180, 180, 0, windowWidth); 
-            lng = map(countriesData[i].latlng[1], -180, 180, 0, windowHeight); 
-            pop = countriesData[i].population;  
-            print(countriesData[i].name, lat, lng, pop);
-
-          //creating a new Dot object and storing in dot array
-            Color = color(random(255), random(255), random(255));
-            dots.push(new Dot(lng, lat, 2, color));
-            print(dots);
-           
+    for (i = 0; i < width; i+= sizeofGrid) {
+        for (j = 0; j < height; j+= sizeofGrid) {
+            if ((i+j) % 2 == 0) {
+               rectFill = color(255,255,255);
+              } else {
+                rectFill = color(0,0,0);
+              }
+            rects.push(new Rect(i*r, j*r, r, rectFill));
         }
-    }
+    } 
+    // print(Rect); 
 }
+
 
 function draw(){
     background (200);
-    image(mapImg, 0, 0, windowWidth, windowHeight);
+
+    for (var k=0; k<rects.length; k++){
+        rects[k].render();
+    }
+
 
     //box to hold text --> map key
     fill(255); 
     stroke(0); 
     strokeWeight(2);
     rect(2, 602, 400, 150); 
+
+    for(var i=0; i<table.getRowCount(); i++){
+        var x = table.get(i,1);
+        var y = table.get(i,2);
+        var size = table.get(i, 3);
+        var col = table.get(i,4);
+        fill(col); 
+        noStroke();
+        circle(x, y, size);
+        text(table.getString(i,0), x+20, y-15);
+      }
 
     fill(0); 
     noStroke();
@@ -72,7 +131,6 @@ function draw(){
 
     //draws dots on the map
     //doesn't register as a function -- need to find different solution for drawing the dots
-    dots.render();
 
 
 }

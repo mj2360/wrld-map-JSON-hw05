@@ -1,15 +1,15 @@
-class Dot {
+class Rect {
     contructor(x, y, size, col){
         this.x = x; 
         this.y = y; 
         this.size = size; 
-        this.col = col; 
+        this.color = col; 
 
     }
 
     render(){
         noStroke(); 
-        fill(this.col); 
-        circle(this.x, this.y, this.size, this.size); 
+        fill(this.color); 
+        rect (this.x, this.y, this.size, this.size);
     }
 }
